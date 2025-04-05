@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Loan Comparison</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <style>
+        :root {
+            --system-blue: #007AFF;
+            --system-gray: #8E8E93;
+            --system-gray-light: #F2F2F7;
+            --system-gray-dark: #636366;
+            --system-green: #34C759;
+            --system-red: #FF3B30;
+            --system-background: #FFFFFF;
+            --system-grouped-background: #F2F2F7;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--system-grouped-background);
+            color: #1C1C1E;
+            font-size: 13px;
+            line-height: 1.4;
+            -webkit-font-smoothing: antialiased;
+        }
+        
+        .container {
+            max-width: 980px;
+            margin: 0 auto;
+            padding: 15px;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 24px;
+            padding-top: 10px;
+        }
+        
+        h1 {
+            font-size: 22px;
+            font-weight: 600;
+            margin: 0 0 4px 0;
+            color: #000;
+        }
+        
+        h2 {
+            font-size: 17px;
+            font-weight: 600;
+            margin: 20px 0 12px 0;
+            color: #000;
+        }
+        
+        h3 {
+            font-size: 15px;
+            font-weight: 600;
+            margin: 0 0 8px 0;
+            color: #000;
+        }
+        
+        .card {
+            background-color: var(--system-background);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 16px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+        }
+        
+        .form-row {
+            display: flex;
+            margin-bottom: 12px;
+            align-items: center;
+        }
+        
+        .form-row label {
+            width: 120px;
+            color: var(--system-gray-dark);
+            font-size: 13px;
+        }
+        
+        input, select {
+            flex: 1;
+            padding: 8px 12px;
+            border: 1px solid #D1D1D6;
+            border-radius: 8px;
+            font-size: 13px;
+            background-color: var(--system-background);
+        }
+        
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--system-blue);
+        }
+        
+        input[type="color"] {
+            height: 30px;
+            padding: 2px;
+            width: 60px;
+        }
+        
+        button {
+            background-color: var(--system-blue);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 8px 16px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        
+        button:hover {
+            background-color: #0062CC;
+        }
+        
+        button.destructive {
+            background-color: var(--system-red);
+        }
+        
+        button.destructive:hover {
+            background-color: #D70015;
+        }
+        
+        .bank-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 12px;
+            margin-top: 16px;
+        }
+        
+        .bank-card {
+            background-color: var(--system-background);
+            border-radius: 10px;
+            padding: 12px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+        
+        .bank-card h3 {
+            display: flex;
+            align-items: center;
+        }
+        
+        .bank-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 6px;
+            margin-right: 8px;
+            display: inline-block;
+        }
+        
+        .bank-detail {
+            color: var(--system-gray-dark);
+            font-size: 12px;
+            margin: 4px 0;
+        }
+        
+        .chart {
+            background-color: var(--system-background);
+            border-radius: 12px;
+            padding: 12px;
+            margin-bottom: 16px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: var(--system-background);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+        }
+        
+        th, td {
+            padding: 12px 16px;
+            text-align: left;
+            border-bottom: 1px solid #E5E5EA;
+        }
+        
+        th {
+            font-weight: 500;
+            color: var(--system-gray-dark);
+            background-color: var(--system-gray-light);
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        td {
+            font-size: 13px;
+        }
+        
+        tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .insights {
+            background-color: var(--system-background);
+            border-radius: 12px;
+            padding: 16px;
+            margin-top: 16px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+        }
+        
+        .insight-item {
+            margin-bottom: 8px;
+            font-size: 13px;
+        }
+        
+        .section-title {
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--system-gray-dark);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Loan Comparison</h1>
+            <p class="section-title">Fixed Monthly Payment: <span id="monthlyPaymentDisplay">1.500</span> €</p>
+        </header>
+        
+        <div class="card">
+            <h2>Bank Profiles</h2>
+            <div id="bankForm">
+                <div class="form-row">
+                    <label for="bankRate">Interest Rate</label>
+                    <input type="number" id="bankRate" step="0.01" min="0" max="20" value="3.0" placeholder="%">
+                </div>
+                <div class="form-row">
+                    <label for="bankName">Bank Name</label>
+                    <input type="text" id="bankName" value="Basisniveau" placeholder="Bank name">
+                </div>
+                <div class="form-row">
+                    <label for="bankColor">Color</label>
+                    <input type="color" id="bankColor" value="#007AFF">
+                </div>
+                <div class="form-row" style="justify-content: flex-end;">
+                    <button id="addBankBtn">Add Bank</button>
+                </div>
+            </div>
+            
+            <div id="bankList" class="bank-list">
+                <!-- Banks will be listed here -->
+            </div>
+        </div>
+        
+        <div class="card">
+            <h2>Loan Parameters</h2>
+            <div class="form-row">
+                <label for="loanAmount">Loan Amount</label>
+                <input type="number" id="loanAmount" value="250000" min="1000" step="1000" placeholder="€">
+            </div>
+            <div class="form-row">
+                <label for="monthlyPayment">Monthly Payment</label>
+                <input type="number" id="monthlyPayment" value="1500" min="100" step="50" placeholder="€">
+            </div>
+            <div class="form-row" style="justify-content: flex-end;">
+                <button id="calculateBtn">Calculate</button>
+            </div>
+        </div>
+        
+        <div id="interestChart" class="chart"></div>
+        <div id="repaymentChart" class="chart"></div>
+        
+        <div class="card">
+            <h2>Comparison Results</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Bank</th>
+                        <th>Rate</th>
+                        <th>Monthly</th>
+                        <th>Repayment</th>
+                        <th>Total Interest</th>
+                        <th>Term</th>
+                        <th>Final Payment</th>
+                    </tr>
+                </thead>
+                <tbody id="resultsBody">
+                    <!-- Results will be inserted here -->
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="insights">
+            <h3>Key Insights</h3>
+            <div id="insightsContent"></div>
+        </div>
+    </div>
+
+    <script>
+        // ====== Initial Bank Profiles ======
+        let bankProfiles = {
+            3.0: { name: "Basis Cheap Bank (BCB)", color: "#007AFF", marker: "diamond" },
+            3.21: { name: "HypofHyperFinance", color: "#FF9500", marker: "square" }, 
+            3.57: { name: "BarcoBank", color: "#34C759", marker: "triangle-up" },
+            3.71: { name: "Coballo Bank", color: "#FF3B30", marker: "triangle-down" },
+            4.0: { name: "Premium Broke", color: "#AF52DE", marker: "pentagon" }
+        };
+
+        // ====== Parameters ======
+        let loanAmount = 250000;
+        let fixedMonthlyPayment = 1500; // € per month
+        let interestRates = Object.keys(bankProfiles).sort((a, b) => a - b);
+
+        // ====== DOM Elements ======
+        const bankList = document.getElementById('bankList');
+        const addBankBtn = document.getElementById('addBankBtn');
+        const bankRateInput = document.getElementById('bankRate');
+        const bankNameInput = document.getElementById('bankName');
+        const bankColorInput = document.getElementById('bankColor');
+        const loanAmountInput = document.getElementById('loanAmount');
+        const monthlyPaymentInput = document.getElementById('monthlyPayment');
+        const calculateBtn = document.getElementById('calculateBtn');
+        const monthlyPaymentDisplay = document.getElementById('monthlyPaymentDisplay');
+
+        // ====== Bank Management ======
+        function renderBankList() {
+            bankList.innerHTML = '';
+            interestRates = Object.keys(bankProfiles).sort((a, b) => a - b);
+            
+            interestRates.forEach(rate => {
+                const bank = bankProfiles[rate];
+                const bankCard = document.createElement('div');
+                bankCard.className = 'bank-card';
+                bankCard.innerHTML = `
+                    <h3><span class="bank-color" style="background-color:${bank.color}"></span>${bank.name}</h3>
+                    <p class="bank-detail"><strong>Rate:</strong> ${rate}%</p>
+                    <button class="destructive" onclick="deleteBank(${rate})">Remove</button>
+                `;
+                bankList.appendChild(bankCard);
+            });
+        }
+
+        function deleteBank(rate) {
+            delete bankProfiles[rate];
+            renderBankList();
+            calculateLoanComparison();
+        }
+
+        addBankBtn.addEventListener('click', () => {
+            const rate = parseFloat(bankRateInput.value);
+            const name = bankNameInput.value.trim();
+            const color = bankColorInput.value;
+            
+            if (!name || isNaN(rate)) {
+                alert('Please enter valid bank name and interest rate');
+                return;
+            }
+            
+            bankProfiles[rate] = { name, color, marker: "line" }; // Marker not used but kept for consistency
+            renderBankList();
+            calculateLoanComparison();
+        });
+
+        // ====== Loan Calculation Function ======
+        function calculateLoanFixedMonthly(principal, monthlyPayment, annualRate) {
+            const monthlyRate = annualRate / 12 / 100;
+            let remaining = principal;
+            let totalInterest = 0;
+            const yearlyData = [];
+            let yearCounter = 0;
+            let yearlyInterest = 0;
+            let yearlyRepayment = 0;
+            
+            while (remaining > 0) {
+                const interest = remaining * monthlyRate;
+                const repayment = Math.min(monthlyPayment - interest, remaining);
+                remaining -= repayment;
+                totalInterest += interest;
+                
+                yearlyInterest += interest;
+                yearlyRepayment += repayment;
+                yearCounter += 1;
+                
+                if (yearCounter === 12) {
+                    yearlyData.push({
+                        Year: yearlyData.length + 1,
+                        Interest: Math.round(yearlyInterest),
+                        Repayment: Math.round(yearlyRepayment),
+                        Remaining: Math.round(remaining),
+                        Rate: annualRate
+                    });
+                    yearlyInterest = 0;
+                    yearlyRepayment = 0;
+                    yearCounter = 0;
+                }
+            }
+            
+            if (yearCounter > 0) {
+                yearlyData.push({
+                    Year: yearlyData.length + 1,
+                    Interest: Math.round(yearlyInterest),
+                    Repayment: Math.round(yearlyRepayment),
+                    Remaining: Math.round(remaining),
+                    Rate: annualRate
+                });
+            }
+            
+            return {
+                yearlyData: yearlyData,
+                totalInterest: totalInterest,
+                years: yearlyData.length
+            };
+        }
+
+        // ====== Main Calculation Function ======
+        function calculateLoanComparison() {
+            loanAmount = parseFloat(loanAmountInput.value);
+            fixedMonthlyPayment = parseFloat(monthlyPaymentInput.value);
+            monthlyPaymentDisplay.textContent = fixedMonthlyPayment.toLocaleString('de-DE');
+            
+            const results = [];
+            let allData = [];
+            let maxYears = 0;
+
+            interestRates.forEach(rate => {
+                const rateNum = parseFloat(rate);
+                const calculation = calculateLoanFixedMonthly(
+                    loanAmount, 
+                    fixedMonthlyPayment, 
+                    rateNum
+                );
+                
+                const bankName = bankProfiles[rate].name;
+                calculation.yearlyData.forEach(year => {
+                    allData.push({
+                        ...year,
+                        Bank: bankName
+                    });
+                });
+                
+                maxYears = Math.max(maxYears, calculation.years);
+                
+                const avgAnnualRepayment = calculation.yearlyData.reduce((sum, year) => sum + year.Repayment, 0) / calculation.years;
+                const repaymentPercentage = (avgAnnualRepayment / loanAmount) * 100;
+                
+                results.push({
+                    Bank: bankName,
+                    InterestRate: `${rate}%`,
+                    MonthlyPayment: `${fixedMonthlyPayment.toLocaleString('de-DE')} €`,
+                    EffectiveRepaymentRate: `${repaymentPercentage.toFixed(2)}%`,
+                    TotalInterestPaid: `${Math.round(calculation.totalInterest).toLocaleString('de-DE')} €`,
+                    LoanTerm: `${calculation.years} years`,
+                    FinalPayment: `${calculation.yearlyData[calculation.yearlyData.length - 1].Repayment.toLocaleString('de-DE')} €`
+                });
+            });
+
+            // ====== Visualization ======
+            function createPlot(yVar, title, ylabel) {
+                const traces = [];
+                
+                interestRates.forEach(rate => {
+                    const bank = bankProfiles[rate];
+                    const rateNum = parseFloat(rate);
+                    const bankData = allData.filter(d => d.Rate === rateNum);
+                    
+                    // Pad data for consistent x-axis
+                    const x = Array.from({length: maxYears}, (_, i) => i + 1);
+                    const y = Array(maxYears).fill(0);
+                    bankData.forEach((year, i) => {
+                        y[i] = year[yVar] / 1000;
+                    });
+                    
+                    traces.push({
+                        x: x,
+                        y: y,
+                        name: `${bank.name} (${rate}%)`,
+                        line: { color: bank.color, width: 1.5 },
+                        mode: 'lines' // Removed markers as requested
+                    });
+                });
+                
+                const layout = {
+                    title: { text: title, font: { size: 14, weight: 'bold' } },
+                    xaxis: { 
+                        title: 'Year',
+                        showgrid: true,
+                        gridcolor: '#E5E5EA',
+                        zerolinecolor: '#E5E5EA'
+                    },
+                    yaxis: { 
+                        title: ylabel,
+                        tickformat: ',.0f',
+                        showgrid: true,
+                        gridcolor: '#E5E5EA',
+                        zerolinecolor: '#E5E5EA'
+                    },
+                    hovermode: 'closest',
+                    plot_bgcolor: 'rgba(0,0,0,0)',
+                    paper_bgcolor: 'rgba(0,0,0,0)',
+                    showlegend: true,
+                    legend: { 
+                        x: 1,
+                        y: 1,
+                        bgcolor: 'rgba(255,255,255,0.7)',
+                        bordercolor: '#E5E5EA',
+                        borderwidth: 1
+                    },
+                    margin: { l: 50, r: 50, t: 50, b: 50 }
+                };
+                
+                return { data: traces, layout: layout };
+            }
+
+            // Create plots
+            Plotly.newPlot('interestChart', 
+                createPlot('Interest', 'Annual Interest Payments', 'Interest (in 1000 €)').data,
+                createPlot('Interest', 'Annual Interest Payments', 'Interest (in 1000 €)').layout
+            );
+            
+            Plotly.newPlot('repaymentChart', 
+                createPlot('Repayment', 'Annual Repayment Amounts', 'Repayment (in 1000 €)').data,
+                createPlot('Repayment', 'Annual Repayment Amounts', 'Repayment (in 1000 €)').layout
+            );
+
+            // ====== Results Table ======
+            const resultsBody = document.getElementById('resultsBody');
+            resultsBody.innerHTML = '';
+            results.forEach(result => {
+                const row = document.createElement('tr');
+                
+                Object.values(result).forEach(value => {
+                    const cell = document.createElement('td');
+                    cell.textContent = value;
+                    row.appendChild(cell);
+                });
+                
+                resultsBody.appendChild(row);
+            });
+
+            // ====== Additional analysis ======
+            const insightsContent = document.getElementById('insightsContent');
+            insightsContent.innerHTML = '';
+            interestRates.forEach(rate => {
+                const bank = bankProfiles[rate];
+                const rateNum = parseFloat(rate);
+                const bankData = allData.filter(d => d.Rate === rateNum);
+                const totalInterest = bankData.reduce((sum, year) => sum + year.Interest, 0);
+                const interestPercentage = (totalInterest / loanAmount) * 100;
+                
+                const insight = document.createElement('div');
+                insight.className = 'insight-item';
+                insight.textContent = `${bank.name}: ${interestPercentage.toFixed(1)}% of loan amount paid as interest`;
+                insightsContent.appendChild(insight);
+            });
+        }
+
+        // Initialize
+        renderBankList();
+        calculateLoanComparison();
+        
+        // Event listeners
+        calculateBtn.addEventListener('click', calculateLoanComparison);
+        
+        // Make deleteBank available globally
+        window.deleteBank = deleteBank;
+    </script>
+</body>
+</html>
